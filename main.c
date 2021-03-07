@@ -37,7 +37,7 @@ int main()
     light_node lights = NULL;
     rectangular_node rectangulars = NULL;
     sphere_node spheres = NULL;
-    color background = { 0.0, 0.1, 0.1 };
+    color background = { 1.0, 1.0, 0.1 };
     struct timespec start, end;
 
 #include "use-models.h"

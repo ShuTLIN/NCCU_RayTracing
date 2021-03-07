@@ -14,7 +14,7 @@ light light2 = {
 
 static const
 sphere sphere1 = {
-    .center = { 5, 0, 5 },
+    .center = { 15, 15, 5 },
     .radius = 3,
     .sphere_fill = {
         .fill_color = { 0.8, 0.8, 0.8 },
@@ -45,6 +45,7 @@ sphere sphere3 = {
     }
 };
 
+//vrp是相機座標位置
 static const
 viewpoint view = {
     .vrp = { 40.0, 40.0, 40.0 },
@@ -52,6 +53,7 @@ viewpoint view = {
     .vup = {  0.0,  0.0,  1.0 }
 };
 
+//逆時針建構平面
 static const
 rectangular rectangular1 = {
     .vertices = {
@@ -62,7 +64,7 @@ rectangular rectangular1 = {
     },
     .normal = { 0.0, 1.0, 0.0 },
     .rectangular_fill = {
-        .fill_color = { 0.6, 0.6, 0.6 },
+        .fill_color = { 1.0, 0.6, 1.0 },
         .Kd = 0.8, .Ks = 0.0, .T = 0.0, .R = 0.5,
         .index_of_refraction = 0.0, .phong_power = 5.0,
     },

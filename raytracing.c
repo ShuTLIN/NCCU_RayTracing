@@ -304,6 +304,7 @@ static void rayConstruction(point3 d, const point3 u, const point3 v,
     double u_s = xmin + ((xmax - xmin) * (float) i / (width - 1));
     double v_s = ymax + ((ymin - ymax) * (float) j / (height - 1));
 
+    
     /* s = e + u_s * u + v_s * v + w_s * w */
     multiply_vector(u, u_s, u_tmp);
     multiply_vector(v, v_s, v_tmp);
@@ -320,6 +321,12 @@ static void rayConstruction(point3 d, const point3 u, const point3 v,
 static void calculateBasisVectors(point3 u, point3 v, point3 w,
                                   const viewpoint *view)
 {
+    /*
+      vrp是相機座標位置
+      w是相機看往的座標
+      u是相機右邊的向量
+      v是相機頭頂的向量*/
+
     /* w  */
     COPY_POINT3(w, view->vpn);
     normalize(w);
@@ -471,8 +478,10 @@ void raytracing(uint8_t *pixels, color background_color,
         for (int i = 0; i < width; i++) {
             double r = 0, g = 0, b = 0;
             /* MSAA */
+            //s從0到3,共sample了4次
             for (int s = 0; s < SAMPLES; s++) {
                 idx_stack_init(&stk);
+                
                 rayConstruction(d, u, v, w,
                                 i * factor + s / factor,
                                 j * factor + s % factor,
@@ -489,6 +498,8 @@ void raytracing(uint8_t *pixels, color background_color,
                     g += background_color[1];
                     b += background_color[2];
                 }
+
+                //前面做了4次採樣,所以最後的顏色要除以4(SAMPLES)
                 pixels[((i + (j * width)) * 3) + 0] = r * 255 / SAMPLES;
                 pixels[((i + (j * width)) * 3) + 1] = g * 255 / SAMPLES;
                 pixels[((i + (j * width)) * 3) + 2] = b * 255 / SAMPLES;
