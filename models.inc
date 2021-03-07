@@ -57,10 +57,10 @@ viewpoint view = {
 static const
 rectangular rectangular1 = {
     .vertices = {
-        {  0.0, 0.0,  0.0 },	/* v0 */
-        {  0.0, 0.0, 20.0 },	/* v1 */
-        { 20.0, 0.0, 20.0 },	/* v3 */
-        { 20.0, 0.0,  0.0 },	/* v2 */
+        {  0.0, 0.0,  0.0 },	
+        { 20.0, 0.0,  0.0 },
+        { 20.0, 0.0, 20.0 },
+        {  0.0, 0.0, 20.0 }	
     },
     .normal = { 0.0, 1.0, 0.0 },
     .rectangular_fill = {
@@ -73,10 +73,10 @@ rectangular rectangular1 = {
 static const
 rectangular rectangular2 = {
     .vertices = {
-        {  0.0,  0.0, 0.0 },	/* v0 */
-        { 20.0,  0.0, 0.0 },	/* v1 */
-        { 20.0, 20.0, 0.0 },	/* v3 */
-        {  0.0, 20.0, 0.0 },	/* v2 */
+        { 20.0, 20.0, 0.0 },
+        { 20.0,  0.0, 0.0 },
+        {  0.0,  0.0, 0.0 },
+        {  0.0, 20.0, 0.0 }   
     },
     .normal = { 0.0, 0.0, 1.0 },
     .rectangular_fill = {
@@ -89,10 +89,10 @@ rectangular rectangular2 = {
 static const
 rectangular rectangular3 = {
     .vertices = {
-        { 0.0,  0.0,  0.0 },	/* v0 */
-        { 0.0, 20.0,  0.0 },	/* v1 */
-        { 0.0, 20.0, 20.0 },	/* v3 */
-        { 0.0,  0.0, 20.0 },	/* v2 */
+        { 0.0, 20.0,  0.0 },
+        { 0.0,  0.0,  0.0 },	
+        { 0.0,  0.0, 20.0 },
+        { 0.0, 20.0, 20.0 }	
     },
     .normal = { 1.0, 0.0, 0.0 },
     .rectangular_fill = {

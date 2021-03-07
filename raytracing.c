@@ -52,78 +52,24 @@ static int rayRectangularIntersection(const point3 ray_e,
                                       rectangular *rec,
                                       intersection *ip, double *t1)
 {
-    point3 e01, e03, p;
-    subtract_vector(rec->vertices[1], rec->vertices[0], e01);
-    subtract_vector(rec->vertices[3], rec->vertices[0], e03);
-
-    cross_product(ray_d, e03, p);
-
-    double det = dot_product(e01, p);
-
-    /* Reject rays orthagonal to the normal vector.
-     * I.e. rays parallell to the plane.
-     */
-    if (det < 1e-4)
+  
+    point3 Intersection_pt; 
+    double planeNl_dot_rayD=dot_product(rec->normal,ray_d);
+    double planeNl_dot_rayE=-(dot_product(rec->normal,ray_e));
+    *t1=planeNl_dot_rayE/planeNl_dot_rayD;
+    
+    multiply_vector(ray_d, *t1, Intersection_pt);
+    add_vector(ray_e,Intersection_pt,Intersection_pt);
+    
+    if(*t1<0){
         return 0;
-
-    double inv_det = 1.0 / det;
-
-    point3 s;
-    subtract_vector(ray_e, rec->vertices[0], s);
-
-    double alpha = inv_det * dot_product(s, p);
-
-    if ((alpha > 1.0) || (alpha < 0.0))
-        return 0;
-
-    point3 q;
-    cross_product(s, e01, q);
-
-    double beta = inv_det * dot_product(ray_d, q);
-    if ((beta > 1.0) || (beta < 0.0))
-        return 0;
-
-    *t1 = inv_det * dot_product(e03, q);
-
-    if (alpha + beta > 1.0f) {
-        /* for the second triangle */
-        point3 e23, e21;
-        subtract_vector(rec->vertices[3], rec->vertices[2], e23);
-        subtract_vector(rec->vertices[1], rec->vertices[2], e21);
-
-        cross_product(ray_d, e21, p);
-
-        det = dot_product(e23, p);
-
-        if (det < 1e-4)
-            return 0;
-
-        inv_det = 1.0 / det;
-        subtract_vector(ray_e, rec->vertices[2], s);
-
-        alpha = inv_det * dot_product(s, p);
-        if (alpha < 0.0)
-            return 0;
-
-        cross_product(s, e23, q);
-        beta = inv_det * dot_product(ray_d, q);
-
-        if ((beta < 0.0) || (beta + alpha > 1.0))
-            return 0;
-
-        *t1 = inv_det * dot_product(e21, q);
     }
-
-    if (*t1 < 1e-4)
-        return 0;
-
-    COPY_POINT3(ip->normal, rec->normal);
-    if (dot_product(ip->normal, ray_d)>0.0)
-        multiply_vector(ip->normal, -1, ip->normal);
-    multiply_vector(ray_d, *t1, ip->point);
-    add_vector(ray_e, ip->point, ip->point);
-
-    return 1;
+    else{
+        COPY_POINT3(ip->normal, rec->normal);
+        COPY_POINT3(ip->point,Intersection_pt);  
+        return 1;    
+    }
+    
 }
 
 static void localColor(color local_color,
@@ -253,7 +199,10 @@ static intersection ray_hit_object(const point3 e, const point3 d,
     *hit_rectangular = NULL;
     *hit_sphere = NULL;
 
-    point3 biased_e;
+    point3 biased_e,e01,e12,e23,e30;
+    point3 point_cross_e01,point_cross_e12,point_cross_e23,point_cross_e30;
+    point3 e0_point,e1_point,e2_point,e3_point;
+    double a,b,c;
     multiply_vector(d, t0, biased_e);
     add_vector(biased_e, e, biased_e);
 
@@ -267,9 +216,36 @@ static intersection ray_hit_object(const point3 e, const point3 d,
             *hit_rectangular = rec;
             nearest = t1;
             result = tmpresult;
+
+            subtract_vector(rec->element.vertices[1],rec->element.vertices[0],e01);
+            subtract_vector(rec->element.vertices[2],rec->element.vertices[1],e12);
+            subtract_vector(rec->element.vertices[3],rec->element.vertices[2],e23);
+            subtract_vector(rec->element.vertices[0],rec->element.vertices[3],e30);
+        
+            subtract_vector(tmpresult.point,rec->element.vertices[0],e0_point);
+            subtract_vector(tmpresult.point,rec->element.vertices[1],e1_point);
+            subtract_vector(tmpresult.point,rec->element.vertices[2],e2_point);
+            subtract_vector(tmpresult.point,rec->element.vertices[3],e3_point);
+        
+
+            cross_product(e0_point,e01,point_cross_e01);
+            cross_product(e1_point,e12,point_cross_e12);
+            cross_product(e2_point,e23,point_cross_e23);
+            cross_product(e3_point,e30,point_cross_e30);
+           
+            //檢查各個cross出來的向量是否方向一致
+            //若dot是負的則代表方向是反的
+            //也代表交點在方形外面
+            a=dot_product(point_cross_e01,point_cross_e12);
+            b=dot_product(point_cross_e01,point_cross_e23);
+            c=dot_product(point_cross_e01,point_cross_e30);
+            
+            if(a<=0 || b<=0 || c<=0){
+                *hit_rectangular = NULL;
+            }
         }
     }
-
+ 
     /* check the spheres */
     for (sphere_node sphere = spheres; sphere; sphere = sphere->next) {
         if (raySphereIntersection(biased_e, d, &(sphere->element),
@@ -304,7 +280,7 @@ static void rayConstruction(point3 d, const point3 u, const point3 v,
     double u_s = xmin + ((xmax - xmin) * (float) i / (width - 1));
     double v_s = ymax + ((ymin - ymax) * (float) j / (height - 1));
 
-    
+    //計算在投影平面上的三維座標來取得射線方向
     /* s = e + u_s * u + v_s * v + w_s * w */
     multiply_vector(u, u_s, u_tmp);
     multiply_vector(v, v_s, v_tmp);
@@ -323,7 +299,7 @@ static void calculateBasisVectors(point3 u, point3 v, point3 w,
 {
     /*
       vrp是相機座標位置
-      w是相機看往的座標
+      w是相機看往的方向
       u是相機右邊的向量
       v是相機頭頂的向量*/
 
