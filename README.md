@@ -13,4 +13,4 @@ Edit background and sphere position
 
 修改rayRectangularIntersection function 中的運算方法,讓程式碼更好理解
 但需要多運算大約1.5倍的時間
-Execution time of default raytracing() : 2.512149 sec
+Execution time of modified raytracing() : 2.512149 sec
