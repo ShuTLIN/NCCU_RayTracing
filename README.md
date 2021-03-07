@@ -14,5 +14,7 @@ Edit background and sphere position
 ![alt text](https://github.com/s0461117/NCCU_RayTracing/blob/main/results/Edit_scene.png)
 
 修改rayRectangularIntersection function 中的運算方法,讓程式碼更好理解
+
 但需要多運算大約1.5倍的時間
+
 Execution time of modified raytracing() : 2.512149 sec
